@@ -1,0 +1,45 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'me.tillmanns.arbitraryencoder.ArbitraryEncoder'
+version =  '0.0.1'
+
+sourceSets {
+    main {
+	java {
+	    srcDir 'src'
+	}
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+}
+
+jar {
+    baseName = 'genericencoder'
+
+    manifest {
+	attributes 'Main-Class': 'me.tillmanns.arbitraryencoder.ArbitraryEncoder'
+    }
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+	attributes 'Implementation-Title': 'Generic Byte Encoder',
+	      'Implementation-Version': version,
+	      'Main-Class': 'me.tillmanns.arbitraryencoder.ArbitraryEncoder'
+    }
+    baseName = project.name + '-all'
+    from(configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }) {
+	// remove all signature files
+	exclude "META-INF/*.SF"
+	exclude "META-INF/*.DSA"
+	exclude "META-INF/*.RSA"
+    } with jar
+}
